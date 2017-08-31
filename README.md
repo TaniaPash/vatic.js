@@ -23,26 +23,36 @@ When developing web applications, it is nice to have the webpage reload automagi
 
 1. Get NodeJS using `nvm` (node version manager).
 
+    ```bash
     curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
+    ```
 
 1. Follow the prompt at the end of the `nvm` to add two lines to your `~/.bashrc`:
 
+    ```bash
     # NVM and NodeJS
     export NVM_DIR="$HOME/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+    ```
 
 1. Install the latest version of NodeJS LTS (tested on `v6.11.2`):
 
+    ```bash
     $ nvm install --lts
+    ```
 
 1. Install `live-server` using `npm` (NodeJS Package Manager):
 
+    ```bash
     $ npm install -g live-server
+    ```
 
 1. Navigate to the `vatic.js` directory and run:
 
+    ```bash
     $ cd ~/vatic.js
     $ live-reload
+    ```
 
     A Chrome browser should automatically open and each time you `touch` a file (i.e., save) in the `live-server` directory, the browser will automatically refresh!
