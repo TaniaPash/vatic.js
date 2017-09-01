@@ -237,6 +237,10 @@ function extractionFileUploaded() {
   slider.reset();
   player.initialize();
 
+  // Save name of zipped folder for XML annotation generation
+  config['framesZipFilename'] = this.files[0].name.substr(0, this.files[0].name.length-4);
+
+  // Extract the specified zipped archive using zip.js
   let promise = extractFramesFromZip(config, this.files[0]);
 
   promise.then((frames) => {
@@ -456,14 +460,15 @@ function addAnnotatedObjectControls(annotatedObject) {
 }
 
 function generateXml() {
+  let filename = 'parker';
   let xml = '<?xml version="1.0" encoding="utf-8"?>\n';
   xml += '<annotation>\n';
   xml += '  <folder>not available</folder>\n';
-  xml += '  <filename>not available</filename>\n';
+  xml += '  <filename>' + config.framesZipFilename + '</filename>\n';
   xml += '  <source>\n';
   xml += '    <type>video</type>\n';
-  xml += '    <sourceImage>vatic frames</sourceImage>\n';
-  xml += '    <sourceAnnotation>vatic</sourceAnnotation>\n';
+  xml += '    <sourceImage>video frames</sourceImage>\n';
+  xml += '    <sourceAnnotation>vatic.js</sourceAnnotation>\n';
   xml += '  </source>\n';
 
   let totalFrames = framesManager.frames.totalFrames();
@@ -490,6 +495,7 @@ function generateXml() {
 
         xml += '    ';
         xml += '<polygon>';
+        xml += '<frame>' + frameNumber + '</frame>';
         xml += '<t>' + frameNumber + '</t>';
         xml += '<pt><x>' + bbox.x + '</x><y>' + bbox.y + '</y><l>' + isGroundThrugh + '</l></pt>';
         xml += '<pt><x>' + bbox.x + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundThrugh + '</l></pt>';
@@ -504,7 +510,7 @@ function generateXml() {
 
   xml += '</annotation>\n';
 
-  let writeStream = streamSaver.createWriteStream('output.xml').getWriter();
+  let writeStream = streamSaver.createWriteStream(config.framesZipFilename + '.xml').getWriter();
   let encoder = new TextEncoder();
   writeStream.write(encoder.encode(xml));
   writeStream.close();
