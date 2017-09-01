@@ -27,6 +27,10 @@ function blobToImage(blob) {
   });
 }
 
+function pad(str, padValue) {
+  return String(Array(padValue).join("0") + str).slice(-padValue);
+}
+
 /**
  * Extracts the frame sequence of a video file.
  */
@@ -133,7 +137,11 @@ function extractFramesFromZip(config, file) {
       .then((zip) => {
         let totalFrames = 0;
         for (let i = 0; ; i++) {
-          let file = zip.file(i + config.imageExtension);
+
+          // Pad an integer with zeros
+          let filename = pad(i, config.padValue);
+
+          let file = zip.file(filename + config.imageExtension);
           if (file == null) {
             totalFrames = i;
             break;
@@ -144,7 +152,11 @@ function extractFramesFromZip(config, file) {
           totalFrames: () => { return totalFrames; },
           getFrame: (frameNumber) => {
             return new Promise((resolve, _) => {
-              let file = zip.file(frameNumber + config.imageExtension);
+
+              // Pad an integer with zeros
+              let filename = pad(frameNumber, config.padValue);
+
+              let file = zip.file(filename + config.imageExtension);
               file
                 .async('arraybuffer')
                 .then((content) => {

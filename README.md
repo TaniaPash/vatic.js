@@ -1,9 +1,9 @@
 vatic.js
 =========
 
-[vatic](http://carlvondrick.com/vatic/) is an interactive video annotation tool developed by Carl Vondrick et. al. at UC Irvine in 2011. It has had a number of improvements since then, including this JavaScript version originally developed by @dbolkensteyns.
+[vatic](http://carlvondrick.com/vatic/) is an interactive video annotation tool developed by Carl Vondrick et. al. at UC Irvine in 2011. It has had a number of improvements since then, including this JavaScript version originally developed by @dbolkensteyns. See the original `vatic.js` in action at [dbolkensteyns/vactic.js](https://dbolkensteyn.github.io/vatic.js/).
 
-See `vatic.js` in action: https://dbolkensteyn.github.io/vatic.js/
+This JavaScript version has been altered to fit into a ROS workflow where a tool has already been used to extract frames from a rosbag. Thus, the only option available when using this version is to load a zip of JPG images.
 
 ## Installation and Running the Server ##
 
