@@ -31,7 +31,7 @@
       </li>
       <li>
         <p>Manually annotate the frame sequence:</p>
-        <p>To create a new bounding box, first click 'n' (for new), and then left click on two locations in the video corresponding to the corners of the box.</p>
+        <p>To create a new bounding box, press 'Alt+n' (for new), and then left click on two locations in the video corresponding to the corners of the box.</p>
         <p>Tip: Use the spacebar to play/pause the video, and the left and right arrows to navigate frame by frame.</p>
         <p>Tip: The visibility of each object can be toogled with its visiblity checkbox under the video.</p>
         <p>Tip: Zoom in with your browser to place the bounding boxes more accurately.</p>
@@ -59,6 +59,7 @@
     <script type="text/javascript" src="dist/pouchdb.min.js"></script>
     <script type="text/javascript" src="dist/jquery-1.12.4.js"></script>
     <script type="text/javascript" src="dist/jquery-ui.js"></script>
+    <script type="text/javascript" src="dist/shortcut.js"></script>
     <script type="text/javascript" src="vatic.js"></script>
     <script type="text/javascript">
       "use strict";
@@ -661,8 +662,6 @@
 
         if (e.keyCode === 32) { // space
           player.toogle();
-        } else if (e.keyCode === 78) { // n
-          doodle.style.cursor = 'crosshair';
         } else if (e.keyCode === 27) { // escape
           if (tmpAnnotatedObject != null) {
             doodle.removeChild(tmpAnnotatedObject.dom);
@@ -682,6 +681,12 @@
           e.preventDefault();
         }
       };
+
+      // Bind to Alt+n
+      shortcut('optn n', document.body).bindsTo(function() {
+        doodle.style.cursor = 'crosshair';
+      });
+
     </script>
   </body>
 </html>
