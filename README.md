@@ -19,11 +19,19 @@ In order to synchronize each annotated frame with the output of a ROS node, it i
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<timestamps>
-  <frame><num>0</num><t>1254846.55015</t></frame>
-  <frame><num>1</num><t>1254846.58445</t></frame>
-  <!-- ... -->
-</timestamps>
+<extractor>
+  <info>
+    <bag>/home/plusk01/Documents/bags/nasa/run3.bag</bag>
+    <topic>/camera/image_raw/compressed</topic>
+  </info>
+  <timestamps>
+    <frame>
+      <num>0</num>
+      <t>1502288464.241372</t>
+    </frame>
+    <!-- ... -->
+  </timestamps>
+</extractor>
 ```
 
 Where the `<num>` element contains the frame number and `<t>` is the timestamp from the ROS `std_msgs::Header/stamp` field. This purpose of this is for better synchronization of images during a ROS pub/sub pipeline. As the image message propagates across nodes, some frames will be dropped and the frame number (`Header/seq`) will become out of sync with the original frames in the zipped archive. However, the timestamp is correct across all of the ROS image pipeline -- therefore, you can use that to synchronize ground truth with algorithm output. The timestamp will be added to the annotation file as shown below.
