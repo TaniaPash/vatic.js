@@ -127,46 +127,50 @@ function extractFramesFromVideo(config, file, progress) {
   }
 }
 
+function getEntryByFilename(entries, filename) {
+  for (let entry of entries)
+    if (entry['filename'] === filename)
+      return entry;
+}
+
 /**
  * Extracts the frame sequence from a previously generated zip file.
  */
 function extractFramesFromZip(config, file) {
+
   return new Promise((resolve, _) => {
-    JSZip
-      .loadAsync(file)
-      .then((zip) => {
-        let totalFrames = 0;
-        for (let i = 0; ; i++) {
 
-          // Pad an integer with zeros
-          let filename = pad(i, config.padValue);
+    zip.createReader(new zip.BlobReader(file), function(reader) {
 
-          let file = zip.file(filename + config.imageExtension);
-          if (file == null) {
-            totalFrames = i;
-            break;
-          }
+      reader.getEntries(function(entries) {
+
+        if (entries.length) {
+
+          console.log(entries)
+
+          resolve({
+            totalFrames: () => { return entries.length; },
+            getFrame: (frameNumber) => {
+
+              return new Promise((resolve, _) => {
+
+                // Pad an integer with zeros
+                let filename = pad(frameNumber, config.padValue) + config.imageExtension;
+                let entry = getEntryByFilename(entries, filename);
+
+                entry.getData(new zip.BlobWriter(), function(content) {
+                  let blob = new Blob([ content ], { type: config.imageMimeType });
+                  resolve(blob);
+                })
+
+              });
+            }
+          });
+
         }
 
-        resolve({
-          totalFrames: () => { return totalFrames; },
-          getFrame: (frameNumber) => {
-            return new Promise((resolve, _) => {
-
-              // Pad an integer with zeros
-              let filename = pad(frameNumber, config.padValue);
-
-              let file = zip.file(filename + config.imageExtension);
-              file
-                .async('arraybuffer')
-                .then((content) => {
-                  let blob = new Blob([ content ], {type: config.imageMimeType});
-                  resolve(blob);
-                });
-            });
-          }
-        });
       });
+    });
   });
 }
 

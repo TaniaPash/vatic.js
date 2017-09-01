@@ -244,6 +244,7 @@ function extractionFileUploaded() {
   slider.reset();
   player.initialize();
 
+  console.log(this.files)
   let promise = extractFramesFromZip(config, this.files[0]);
 
   promise.then((frames) => {
