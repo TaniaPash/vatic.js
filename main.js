@@ -27,8 +27,8 @@ let xmlFile = document.querySelector('#xmlFile');
 let msgElement = $('#msg');
 let videoDimensionsElement = document.querySelector('#videoDimensions');
 let extractionProgressElement = document.querySelector('#extractionProgress');
-let playButton = document.querySelector('#play');
-let pauseButton = document.querySelector('#pause');
+let playBtn = $('#play');
+let frameCount = $('#frameCount');
 let speedInput = document.querySelector('#speed');
 let sliderElement = document.querySelector('#slider');
 let generateXmlButton = document.querySelector('#generateXml');
@@ -44,6 +44,8 @@ let slider = {
       onChange(ui.value);
     });
     $(sliderElement).slider('enable');
+
+    frameCount.text('0 / ' + max);
   },
   setPosition: function(frameNumber) {
     $(sliderElement).slider('option', 'value', frameNumber);
@@ -65,16 +67,11 @@ let player = {
     this.isPlaying = false;
     this.isReady = false;
 
-    playButton.disabled = true;
-    playButton.style.display = 'block';
-    pauseButton.disabled = true;
-    pauseButton.style.display = 'none';
+    playBtn.text('Play');
   },
 
   ready: function() {
     this.isReady = true;
-
-    playButton.disabled = false;
   },
 
   seek: function(frameNumber) {
@@ -97,10 +94,7 @@ let player = {
 
     this.isPlaying = true;
 
-    playButton.disabled = true;
-    playButton.style.display = 'none';
-    pauseButton.disabled = false;
-    pauseButton.style.display = 'block';
+    playBtn.text('Pause');
 
     this.nextFrame();
   },
@@ -116,10 +110,7 @@ let player = {
       this.timeout = null;
     }
 
-    pauseButton.disabled = true;
-    pauseButton.style.display = 'none';
-    playButton.disabled = false;
-    playButton.style.display = 'block';
+    playBtn.text('Play');
   },
 
   toogle: function() {
@@ -150,6 +141,10 @@ let player = {
     return new Promise((resolve, _) => {
       annotatedObjectsTracker.getFrameWithObjects(frameNumber).then((frameWithObjects) => {
         ctx.drawImage(frameWithObjects.img, 0, 0);
+
+        // Update frame number
+        frameCount.text(frameNumber + ' / ' + $(sliderElement).slider('option', 'max'))
+
 
         for (let i = 0; i < frameWithObjects.objects.length; i++) {
           let object = frameWithObjects.objects[i];
@@ -190,10 +185,7 @@ let player = {
     this.currentFrame = 0;
     this.isPlaying = false;
 
-    playButton.disabled = false;
-    playButton.style.display = 'block';
-    pauseButton.disabled = true;
-    pauseButton.style.display = 'none';
+    playBtn.text('Play');
   }
 };
 
@@ -212,24 +204,23 @@ function clearAnnotatedObject(i) {
 
 zipFile.addEventListener('change', extractionFileUploaded, false);
 xmlFile.addEventListener('change', importXml, false);
-playButton.addEventListener('click', playClicked, false);
-pauseButton.addEventListener('click', pauseClicked, false);
+playBtn.bind('click', playClicked);
 generateXmlButton.addEventListener('click', generateXml, false);
 
 function playClicked() {
-  player.play();
-}
-
-function pauseClicked() {
-  player.pause();
+  if (player.isPlaying) {
+    player.pause();
+  } else {
+    player.play();
+  }
 }
 
 function initializeCanvasDimensions(img) {
-  doodle.style.width = img.width + 'px';
+  // doodle.style.width = img.width + 'px';
   doodle.style.height = img.height + 'px';
   canvas.width = img.width;
   canvas.height = img.height;
-  sliderElement.style.width = img.width + 'px';
+  // sliderElement.style.width = img.width + 'px';
 }
 
 function extractionFileUploaded() {
@@ -268,7 +259,6 @@ function extractionFileUploaded() {
           player.ready();
 
           xmlFile.disabled = false;
-          playButton.disabled = false;
           generateXmlButton.disabled = false;
         });
       });

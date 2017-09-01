@@ -30,11 +30,20 @@
         </div>
 
         <div id="jumbo-annotate" hidden>
-          <div id="doodle">
-            <canvas id="canvas"></canvas>
+          <div id="doodle-container"><div id="doodle"><canvas id="canvas"></canvas></div></div>
+
+          <div class="row controls-container">
+            <div class="col-sm-1">
+              <button id="play" class="btn btn-success">Play</button>
+            </div>
+            <div class="col-sm-9">
+              <div id="slider"></div>
+            </div>
+            <div class="col-sm-2">
+              <div id="frameCount">0 / 11477</div>
+            </div>
           </div>
-          <p><input type="button" id="play" value="Play" disabled="true" /><input type="button" id="pause" value="Pause" disabled="true" style="display: none;" /></p>
-          <div id="slider"></div>
+
           <p><label for="speed">Speed multiplier: </label><input type="text" id="speed" value="1.00" size="4" /></p>
           <div id="objects"></div>
 
@@ -99,7 +108,9 @@
       <div class="row">
         <div class="col-sm-12">
           <div class="alert alert-info" role="alert">
-            This tool works best in Chrome and has been tested successfully in Firefox.&nbsp;&nbsp;&nbsp;<a href="http://web.mit.edu/vondrick/vatic/" target="new">Vatic</a> is a tool developed at UC Irvine.
+            This tool works best in Chrome and possibly Firefox.
+            &nbsp;&nbsp;&nbsp;<a href="http://web.mit.edu/vondrick/vatic/" target="new">Vatic</a> is a tool developed at UC Irvine.
+            &nbsp;&nbsp;&nbsp;vatic.js was originally developed by <strong><a class="at-handle" href="https://github.com/dbolkensteyn/vatic.js">@dbolkensteyn</a></strong>.
           </div>
         </div>
       </div>

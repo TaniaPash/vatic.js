@@ -1,11 +1,21 @@
 vatic.js
 =========
 
-[vatic](http://carlvondrick.com/vatic/) is an interactive video annotation tool developed by Carl Vondrick et. al. at UC Irvine in 2011. It has had a number of improvements since then, including this JavaScript version originally developed by @dbolkensteyns. See the original `vatic.js` in action at [dbolkensteyns/vactic.js](https://dbolkensteyn.github.io/vatic.js/).
+[vatic](http://carlvondrick.com/vatic/) is an interactive video annotation tool developed by Carl Vondrick et. al. at UC Irvine in 2011. It has had a number of improvements since then, including this JavaScript version originally developed by **@dbolkensteyns**. See `vatic.js` in action [here](https://plusk01.github.io/vatic.js/).
 
 This JavaScript version has been altered to fit into a ROS workflow where a tool has already been used to extract frames from a rosbag. Thus, the only option available when using this version is to load a zip of JPG images.
 
-## Installation and Running the Server ##
+**Note**: This tool works best with images that have fewer number of objects to be identified/tracked in a given frame (i.e., < 5-10).
+
+## Purpose ##
+
+The purpose of this web tool is to easily annotate video that is used in a research setting while developing new algorithms for target tracking, object recognition, etc. The XML annotation file can be used to compare algorithm outputs with a human-decided "ground truth".
+
+## Instructions and Workflow ##
+
+Because this tool is expected to be used in a ROS environment, it is required to upload a zipped archive of already extracted frames. This image frames can be of any size (as long as they are all the same) and must be named as `<frame_number>.jpg` using the JPG image codec. Note that frame numbers are not to be padded with zeros.
+
+## Installation and Running a Local Server ##
 
 The simplest way to run `vatic.js` is to clone and use a simple HTTP server as follows:
 
