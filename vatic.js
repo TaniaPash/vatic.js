@@ -31,102 +31,6 @@ function pad(str, padValue) {
   return String(Array(padValue).join("0") + str).slice(-padValue);
 }
 
-/**
- * Extracts the frame sequence of a video file.
- */
-function extractFramesFromVideo(config, file, progress) {
-  let resolve = null;
-  let db = null;
-  let video = document.createElement('video');
-  let canvas = document.createElement('canvas');
-  let ctx = canvas.getContext('2d');
-  let dimensionsInitialized = false;
-  let totalFrames = 0;
-  let processedFrames = 0;
-  let lastApproxFrame = -1;
-  let lastProgressFrame = -1;
-  let attachmentName = 'img' + config.imageExtension;
-
-  return new Promise((_resolve, _) => {
-    resolve = _resolve;
-
-    let dbName = 'vatic_js';
-    db = new PouchDB(dbName).destroy().then(() => {
-      db = new PouchDB(dbName);
-
-      video.autoplay = false;
-      video.muted = true;
-      video.loop = false;
-      video.playbackRate = config.playbackRate;
-      video.src = URL.createObjectURL(file);
-      compatibility.requestAnimationFrame(onBrowserAnimationFrame);
-      video.play();
-    });
-  });
-
-  function onBrowserAnimationFrame() {
-    if (dimensionsInitialized && video.ended) {
-      if (processedFrames == totalFrames) {
-        videoEnded();
-      }
-      return;
-    }
-
-    compatibility.requestAnimationFrame(onBrowserAnimationFrame);
-
-    if (video.readyState !== video.HAVE_CURRENT_DATA &&
-        video.readyState !== video.HAVE_FUTURE_DATA &&
-        video.readyState !== video.HAVE_ENOUGH_DATA) {
-      return;
-    }
-
-    let currentApproxFrame = Math.round(video.currentTime * config.fps);
-    if (currentApproxFrame != lastApproxFrame) {
-      lastApproxFrame = currentApproxFrame;
-      let frameNumber = totalFrames;
-      totalFrames++;
-
-      if (!dimensionsInitialized) {
-        dimensionsInitialized = true;
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-      }
-
-      ctx.drawImage(video, 0, 0);
-      canvas.toBlob(
-        (blob) => {
-          db.putAttachment(frameNumber.toString(), attachmentName, blob, config.imageMimeType).then((doc) => {
-            processedFrames++;
-
-            if (frameNumber > lastProgressFrame) {
-              lastProgressFrame = frameNumber;
-              progress(video.currentTime / video.duration, processedFrames, blob);
-            }
-
-            if (video.ended && processedFrames == totalFrames) {
-              videoEnded();
-            }
-          });
-        },
-        config.imageMimeType);
-    }
-  }
-
-  function videoEnded() {
-    if (video.src != '') {
-      URL.revokeObjectURL(video.src);
-      video.src = '';
-
-      resolve({
-        totalFrames: () => { return totalFrames; },
-        getFrame: (frameNumber) => {
-          return db.getAttachment(frameNumber.toString(), attachmentName);
-        }
-      });
-    }
-  }
-}
-
 function getEntryByFilename(entries, filename) {
   for (let entry of entries)
     if (entry['filename'] === filename)
@@ -139,19 +43,12 @@ function getEntryByFilename(entries, filename) {
 function extractFramesFromZip(config, file) {
 
   return new Promise((resolve, _) => {
-
     zip.createReader(new zip.BlobReader(file), function(reader) {
-
       reader.getEntries(function(entries) {
-
         if (entries.length) {
-
-          console.log(entries)
-
           resolve({
             totalFrames: () => { return entries.length; },
             getFrame: (frameNumber) => {
-
               return new Promise((resolve, _) => {
 
                 // Pad an integer with zeros
@@ -166,9 +63,7 @@ function extractFramesFromZip(config, file) {
               });
             }
           });
-
         }
-
       });
     });
   });

@@ -216,11 +216,13 @@ function playClicked() {
 }
 
 function initializeCanvasDimensions(img) {
-  // doodle.style.width = img.width + 'px';
+  // for some reason, without this line
+  // optical flow tracking doesn't really work...
+  doodle.style.width = img.width + 'px';
+
   doodle.style.height = img.height + 'px';
   canvas.width = img.width;
   canvas.height = img.height;
-  // sliderElement.style.width = img.width + 'px';
 }
 
 function extractionFileUploaded() {
@@ -235,7 +237,6 @@ function extractionFileUploaded() {
   slider.reset();
   player.initialize();
 
-  console.log(this.files)
   let promise = extractFramesFromZip(config, this.files[0]);
 
   promise.then((frames) => {
