@@ -87,7 +87,7 @@ function extractFramesFromZip(config, file) {
                 </timestamps>
 
               */
-              return config.timestampXML.find(`frame num:contains(${frameNumber})`).parent().find('t').text() || 0;
+              return config.timestampXML.find(`frame num`).filter((i,e)=>{ return $(e).text() == frameNumber }).parent().find('t').text() || 0;
             }
           });
         } else {

@@ -463,14 +463,15 @@ function addAnnotatedObjectControls(annotatedObject) {
 }
 
 function generateXml() {
-  let filename = 'parker';
+  let type = (config.timestampXML && config.timestampXML.find(`extractor info topic`).text()) || 'video';
+  let sourceImage = (config.timestampXML && config.timestampXML.find(`extractor info bag`).text()) || 'video frames';
   let xml = '<?xml version="1.0" encoding="utf-8"?>\n';
   xml += '<annotation>\n';
   xml += '  <folder>not available</folder>\n';
   xml += '  <filename>' + config.framesZipFilename + '</filename>\n';
   xml += '  <source>\n';
-  xml += '    <type>video</type>\n';
-  xml += '    <sourceImage>video frames</sourceImage>\n';
+  xml += '    <type>' + type + '</type>\n';
+  xml += '    <sourceImage>' + sourceImage + '</sourceImage>\n';
   xml += '    <sourceAnnotation>vatic.js</sourceAnnotation>\n';
   xml += '  </source>\n';
 
