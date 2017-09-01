@@ -26,7 +26,7 @@ In order to synchronize each annotated frame with the output of a ROS node, it i
 </timestamps>
 ```
 
-Where the `<num>` element contains the frame number and `<t>` is the timestamp from the ROS `std_msgs::Header/stamp` field.
+Where the `<num>` element contains the frame number and `<t>` is the timestamp from the ROS `std_msgs::Header/stamp` field. This purpose of this is for better synchronization of images during a ROS pub/sub pipeline. As the image message propagates across nodes, some frames will be dropped and the frame number (`Header/seq`) will become out of sync with the original frames in the zipped archive. However, the timestamp is correct across all of the ROS image pipeline -- therefore, you can use that to synchronize ground truth with algorithm output. The timestamp will be added to the annotation file as shown below.
 
 After you have annotated your video frames, the output XML file will look like:
 
