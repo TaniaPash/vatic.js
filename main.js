@@ -14,7 +14,10 @@ let config = {
   imageExtension: '.jpg',
 
   // Name of the extracted frames zip archive
-  framesZipFilename: 'extracted-frames.zip'
+  framesZipFilename: 'extracted-frames.zip',
+
+  // File name of the timestamp map that is optionally present in the zip archive
+  timestampFile: 'timestamp.xml'
 };
 
 let jumboWelcomeElement = $('#jumbo-welcome');
@@ -496,7 +499,7 @@ function generateXml() {
         xml += '    ';
         xml += '<polygon>';
         xml += '<frame>' + frameNumber + '</frame>';
-        xml += '<t>' + frameNumber + '</t>';
+        xml += '<t>' + framesManager.frames.getFrameTimestamp(frameNumber) + '</t>';
         xml += '<pt><x>' + bbox.x + '</x><y>' + bbox.y + '</y><l>' + isGroundThrugh + '</l></pt>';
         xml += '<pt><x>' + bbox.x + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundThrugh + '</l></pt>';
         xml += '<pt><x>' + (bbox.x + bbox.width) + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundThrugh + '</l></pt>';

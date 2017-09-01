@@ -35,6 +35,8 @@ function getEntryByFilename(entries, filename) {
   for (let entry of entries)
     if (entry['filename'] === filename)
       return entry;
+
+  return false;
 }
 
 /**
@@ -46,6 +48,15 @@ function extractFramesFromZip(config, file) {
     zip.createReader(new zip.BlobReader(file), function(reader) {
       reader.getEntries(function(entries) {
         if (entries.length) {
+
+          // Try and find the timestamp file
+          let entry = getEntryByFilename(entries, config.timestampFile);
+          if (entry) {
+            entry.getData(new zip.TextWriter(), function(text) {
+              config.timestampXML = $($.parseXML(text));
+            });
+          }
+
           resolve({
             totalFrames: () => { return entries.length; },
             getFrame: (frameNumber) => {
@@ -61,8 +72,27 @@ function extractFramesFromZip(config, file) {
                 })
 
               });
+            },
+            getFrameTimestamp: (frameNumber) => {
+
+              // Did this archive even have a timestamp map file?
+              if (!config.timestampXML) return 0;
+
+              // Parse the XML file with format:
+              /*
+
+                <?xml version="1.0" encoding="utf-8"?>
+                <timestamps>
+                  <frame><num>0</num><t>123123.666</t></frame>
+                </timestamps>
+
+              */
+              return config.timestampXML.find(`frame num:contains(${frameNumber})`).parent().find('t').text() || 0;
             }
           });
+        } else {
+          console.log('no entries?');
+          console.log(entries);
         }
       });
     });
