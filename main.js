@@ -4,7 +4,7 @@ let config = {
   fps: 30,
 
   // How many leading zeros
-  padValue: 6,
+  padValue: 0,
 
   // Low rate decreases the chance of losing frames with poor browser performances
   playbackRate: 0.4,
@@ -17,11 +17,14 @@ let config = {
   framesZipFilename: 'extracted-frames.zip'
 };
 
+let jumboWelcomeElement = $('#jumbo-welcome');
+let jumboAnnotateElement = $('#jumbo-annotate');
 let doodle = document.querySelector('#doodle');
 let canvas = document.querySelector('#canvas');
 let ctx = canvas.getContext('2d');
 let zipFile = document.querySelector('#zipFile');
 let xmlFile = document.querySelector('#xmlFile');
+let msgElement = $('#msg');
 let videoDimensionsElement = document.querySelector('#videoDimensions');
 let extractionProgressElement = document.querySelector('#extractionProgress');
 let playButton = document.querySelector('#play');
@@ -244,6 +247,9 @@ function extractionFileUploaded() {
   let promise = extractFramesFromZip(config, this.files[0]);
 
   promise.then((frames) => {
+    msgElement.prop('hidden', false);
+    jumboAnnotateElement.prop('hidden', false);
+    jumboWelcomeElement.prop('hidden', true);
     extractionProgressElement.innerHTML = 'Extraction completed. ' + frames.totalFrames() + ' frames captured.';
     if (frames.totalFrames() > 0) {
       frames.getFrame(0).then((blob) => {

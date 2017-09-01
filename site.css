@@ -104,24 +104,11 @@
   border-radius: 4px;
 }
 
-/* Sticky footer styles
--------------------------------------------------- */
-html {
-  position: relative;
-  min-height: 100%;
-}
-body {
-  /* Margin bottom by footer height */
-  margin-bottom: 60px;
-}
-.footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  /* Set the fixed height of the footer here */
-  height: 60px;
-  line-height: 60px; /* Vertically center the text there */
-  background-color: #f5f5f5;
+/* Custom Styles */
+
+.navbar span.navbar-text {
+  font-size: 90%;
+  margin-right: 2em;
 }
 
 .step {
@@ -130,6 +117,11 @@ body {
 
 .step ul > li {
   margin-top: 0.4em;
+}
+
+.step h1 i {
+  margin-top: -0.4em;
+  margin-right: -0.25em;
 }
 
 .step-body {
@@ -147,6 +139,26 @@ body {
   display:         flex;
 }
 
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+.footer {
+  bottom: 0;
+  margin-top: 3em;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  line-height: 60px; /* Vertically center the text there */
+  background-color: #f5f5f5;
+}
+
 
 /* Custom page CSS
 -------------------------------------------------- */
@@ -154,11 +166,6 @@ body {
 
 body > .container {
   padding: 30px 0px 0;
-}
-
-.footer {
-  margin-top: 3em;
-  position: relative;
 }
 
 .footer > .container {
