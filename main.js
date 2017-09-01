@@ -482,10 +482,7 @@ function generateXml() {
 
     for (let frameNumber = 0; frameNumber < totalFrames; frameNumber++) {
       let annotatedFrame = annotatedObject.get(frameNumber);
-      if (annotatedFrame == null) {
-        window.alert('Play the video in full before downloading the XML so that bounding box data is available for all frames.');
-        return;
-      }
+      if (annotatedFrame == null) continue;
 
       let bbox = annotatedFrame.bbox;
       if (bbox != null) {
