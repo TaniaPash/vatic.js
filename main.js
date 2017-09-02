@@ -471,32 +471,42 @@ function addAnnotatedObjectControls(annotatedObject) {
   $('#objects').append(div);
 }
 
+function downloadFile(filename, text) {
+  window.URL = window.webkitURL || window.URL;
+
+  let bb = new Blob([text], {type: 'text/xml'});
+
+  var a = document.querySelector('#downloadXML');
+  a.download = filename;
+  a.href = window.URL.createObjectURL(bb);
+  a.click();
+}
+
 function generateXml() {
-  let type = (config.timestampXML && config.timestampXML.find(`extractor info topic`).text()) || 'video';
-  let sourceImage = (config.timestampXML && config.timestampXML.find(`extractor info bag`).text()) || 'video frames';
+  let totalFrames = framesManager.frames.totalFrames();
   let xml = '<?xml version="1.0" encoding="utf-8"?>\n';
   xml += '<annotation>\n';
   xml += '  <folder>not available</folder>\n';
   xml += '  <filename>' + config.framesZipFilename + '</filename>\n';
   xml += '  <source>\n';
-  xml += '    <type>' + type + '</type>\n';
-  xml += '    <sourceImage>' + sourceImage + '</sourceImage>\n';
+  xml += '    <type>' + framesManager.frames.getSourceType() + '</type>\n';
+  xml += '    <sourceImage>' + framesManager.frames.getSourceImage() + '</sourceImage>\n';
   xml += '    <sourceAnnotation>vatic.js</sourceAnnotation>\n';
+  xml += '    <totalFrames>' + totalFrames + '</totalFrames>\n';
   xml += '  </source>\n';
 
-  let totalFrames = framesManager.frames.totalFrames();
   for (let i = 0; i < annotatedObjectsTracker.annotatedObjects.length; i++) {
     let annotatedObject = annotatedObjectsTracker.annotatedObjects[i];
 
     xml += '  <object>\n';
     xml += '    <name>' + annotatedObject.name + '</name>\n';
-    xml += '    <moving>true</moving>\n';
-    xml += '    <action/>\n';
-    xml += '    <verified>0</verified>\n';
+    // xml += '    <moving>true</moving>\n';
+    // xml += '    <action/>\n';
+    // xml += '    <verified>0</verified>\n';
     xml += '    <id>' + annotatedObject.id + '</id>\n';
-    xml += '    <createdFrame>0</createdFrame>\n';
-    xml += '    <startFrame>0</startFrame>\n';
-    xml += '    <endFrame>' + (totalFrames - 1 ) + '</endFrame>\n';
+    // xml += '    <createdFrame>0</createdFrame>\n';
+    // xml += '    <startFrame>0</startFrame>\n';
+    // xml += '    <endFrame>' + (totalFrames - 1 ) + '</endFrame>\n';
 
     for (let frameNumber = 0; frameNumber < totalFrames; frameNumber++) {
       let annotatedFrame = annotatedObject.get(frameNumber);
@@ -504,16 +514,16 @@ function generateXml() {
 
       let bbox = annotatedFrame.bbox;
       if (bbox != null) {
-        let isGroundThrugh = annotatedFrame.isGroundTruth ? 1 : 0;
+        let isGroundThruth = annotatedFrame.isGroundTruth ? 1 : 0;
 
         xml += '    ';
         xml += '<polygon>';
         xml += '<frame>' + frameNumber + '</frame>';
         xml += '<t>' + framesManager.frames.getFrameTimestamp(frameNumber) + '</t>';
-        xml += '<pt><x>' + bbox.x + '</x><y>' + bbox.y + '</y><l>' + isGroundThrugh + '</l></pt>';
-        xml += '<pt><x>' + bbox.x + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundThrugh + '</l></pt>';
-        xml += '<pt><x>' + (bbox.x + bbox.width) + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundThrugh + '</l></pt>';
-        xml += '<pt><x>' + (bbox.x + bbox.width) + '</x><y>' + bbox.y + '</y><l>' + isGroundThrugh + '</l></pt>';
+        xml += '<pt><x>' + bbox.x + '</x><y>' + bbox.y + '</y><l>' + isGroundThruth + '</l></pt>';
+        xml += '<pt><x>' + bbox.x + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundThruth + '</l></pt>';
+        xml += '<pt><x>' + (bbox.x + bbox.width) + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundThruth + '</l></pt>';
+        xml += '<pt><x>' + (bbox.x + bbox.width) + '</x><y>' + bbox.y + '</y><l>' + isGroundThruth + '</l></pt>';
         xml += '</polygon>\n';
       }
     }
@@ -523,10 +533,7 @@ function generateXml() {
 
   xml += '</annotation>\n';
 
-  let writeStream = streamSaver.createWriteStream(config.framesZipFilename + '.xml').getWriter();
-  let encoder = new TextEncoder();
-  writeStream.write(encoder.encode(xml));
-  writeStream.close();
+  downloadFile(config.framesZipFilename + '.xml', xml);
 }
 
 function importXml() {

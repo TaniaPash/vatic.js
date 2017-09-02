@@ -49,16 +49,44 @@ function extractFramesFromZip(config, file) {
       reader.getEntries(function(entries) {
         if (entries.length) {
 
+          // total frames depends on whether or not their is a timestamp file
+          let totalFrames = entries.length;
+
+          let timestampXML = null;
+          let timestampMap = {};
+
           // Try and find the timestamp file
           let entry = getEntryByFilename(entries, config.timestampFile);
           if (entry) {
+
+            // there is actually one less total frame
+            totalFrames -= 1;
+
             entry.getData(new zip.TextWriter(), function(text) {
-              config.timestampXML = $($.parseXML(text));
+              timestampXML = $($.parseXML(text));
+
+              // Fast XML parsing into a map for use when generating the XML in a loop
+              /*
+
+                <?xml version="1.0" encoding="utf-8"?>
+                <timestamps>
+                  <frame><num>0</num><t>123123.666</t></frame>
+                </timestamps>
+
+              */
+              let all = timestampXML.find('frame');
+              for (let i=0; i<all.length; i++) {
+                let num = all.eq(i).find('num').text();
+                let t = all.eq(i).find('t').text();
+                
+                timestampMap[num] = t;
+              }
+
             });
           }
 
           resolve({
-            totalFrames: () => { return entries.length; },
+            totalFrames: () => { return totalFrames; },
             getFrame: (frameNumber) => {
               return new Promise((resolve, _) => {
 
@@ -77,18 +105,18 @@ function extractFramesFromZip(config, file) {
             getFrameTimestamp: (frameNumber) => {
 
               // Did this archive even have a timestamp map file?
-              if (!config.timestampXML) return 0;
+              if (!timestampXML) return 0;
 
-              // Parse the XML file with format:
-              /*
-
-                <?xml version="1.0" encoding="utf-8"?>
-                <timestamps>
-                  <frame><num>0</num><t>123123.666</t></frame>
-                </timestamps>
-
-              */
-              return config.timestampXML.find(`frame num`).filter((i,e)=>{ return $(e).text() == frameNumber }).parent().find('t').text() || 0;
+              // Lookup in the timestamp object
+              return timestampMap[frameNumber];
+            },
+            getSourceType: () => {
+              if (!timestampXML) return 'video';
+              return timestampXML.find(`extractor info topic`).text();
+            },
+            getSourceImage: () => {
+              if (!timestampXML) return 'video frames';
+              return timestampXML.find(`extractor info bag`).text();
             }
           });
         } else {
