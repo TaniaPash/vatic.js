@@ -6,9 +6,6 @@ let config = {
   // How many leading zeros
   padValue: 0,
 
-  // Low rate decreases the chance of losing frames with poor browser performances
-  playbackRate: 0.4,
-
   // Format of the extracted frames
   imageMimeType: 'image/jpeg',
   imageExtension: '.jpg',
@@ -155,9 +152,13 @@ let player = {
           let annotatedObject = object.annotatedObject;
           let annotatedFrame = object.annotatedFrame;
           if (annotatedFrame.isVisible()) {
+
+            // we assume the border is given in pixels
+            let border = parseInt($(annotatedObject.dom).css('border-width'));
+
             annotatedObject.dom.style.display = 'block';
-            annotatedObject.dom.style.width = annotatedFrame.bbox.width + 'px';
-            annotatedObject.dom.style.height = annotatedFrame.bbox.height + 'px';
+            annotatedObject.dom.style.width = annotatedFrame.bbox.width + border*2 + 'px';
+            annotatedObject.dom.style.height = annotatedFrame.bbox.height + border*2 + 'px';
             annotatedObject.dom.style.left = annotatedFrame.bbox.x + 'px';
             annotatedObject.dom.style.top = annotatedFrame.bbox.y + 'px';
             annotatedObject.visible.prop('checked', true);
@@ -348,12 +349,16 @@ doodle.onmousemove = function (e) {
   }
 }
 
+/**
+ * Creation of a new bounding box
+ */
 doodle.onclick = function (e) {
   if (doodle.style.cursor != 'crosshair') {
     return;
   }
 
   if (tmpAnnotatedObject != null) {
+    // second click
     let annotatedObject = new AnnotatedObject();
     annotatedObject.dom = tmpAnnotatedObject.dom;
     let bbox = new BoundingBox(tmpAnnotatedObject.x, tmpAnnotatedObject.y, tmpAnnotatedObject.width, tmpAnnotatedObject.height);
@@ -373,6 +378,7 @@ doodle.onclick = function (e) {
 
     doodle.style.cursor = 'default';
   } else {
+    // First click
     mouse.startX = mouse.x;
     mouse.startY = mouse.y;
 

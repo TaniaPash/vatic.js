@@ -16,14 +16,15 @@
 }
 
 .bbox {
+  /* border width MUST be given in pixels */
   border: 1px solid #FF0000;
   position: absolute;
   z-index: 3;
 }
 
 .handle, .ui-resizable-handle {
-  width: 11px;
-  height: 11px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   border: 1px solid rgba(255, 0, 0, .5);
   background-color: rgba(255, 255, 0, .05);
