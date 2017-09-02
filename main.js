@@ -30,6 +30,7 @@ let xmlFile = document.querySelector('#xmlFile');
 let msgElement = $('#msg');
 let videoDimensionsElement = document.querySelector('#videoDimensions');
 let extractionProgressElement = document.querySelector('#extractionProgress');
+let timestampElement = document.querySelector('#timestampLoaded');
 let playBtn = $('#play');
 let frameCount = $('#frameCount');
 let speedInput = document.querySelector('#speed');
@@ -257,6 +258,8 @@ function extractionFileUploaded() {
           initializeCanvasDimensions(img);
           ctx.drawImage(img, 0, 0);
           videoDimensionsElement.innerHTML = 'Video dimensions determined: ' + img.width + 'x' + img.height;
+
+          if (frames.hasTimestamp()) timestampElement.innerHTML = 'Loaded timestamps from ' + config.timestampFile;
 
           framesManager.set(frames);
           slider.init(
