@@ -101,7 +101,7 @@ function extractFramesFromZip(config, file) {
 
               });
             },
-            hasTimestamp: () => { return (!!config.timestampXML); },
+            hasTimestamp: () => { return (!!timestampXML); },
             getFrameTimestamp: (frameNumber) => {
 
               // Did this archive even have a timestamp map file?
