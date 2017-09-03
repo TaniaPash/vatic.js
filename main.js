@@ -61,12 +61,14 @@ let player = {
   currentFrame: 0,
   isPlaying: false,
   isReady: false,
+  isSeeking: false,
   timeout: null,
 
   initialize: function() {
     this.currentFrame = 0;
     this.isPlaying = false;
     this.isReady = false;
+    this.isSeeking = false;
 
     playBtn.text('Play');
   },
@@ -78,11 +80,17 @@ let player = {
   seek: function(frameNumber) {
     if (!this.isReady) return;
 
+    // Don't allow the user to seek before the last seek is completed
+    if (this.isSeeking) return;
+
     this.pause();
 
-
     if (frameNumber >= 0 && frameNumber < framesManager.frames.totalFrames()) {
-      this.drawFrame(frameNumber);
+      // This will lock the controls so that the user doesn't jump
+      // around frames as promises are resolved.
+      this.isSeeking = true;
+
+      this.drawFrame(frameNumber).then(() => { this.isSeeking = false; });
       this.currentFrame = frameNumber;
     }
   },
