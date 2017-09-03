@@ -76,11 +76,10 @@ let player = {
   },
 
   seek: function(frameNumber) {
-    if (!this.isReady) {
-      return;
-    }
+    if (!this.isReady) return;
 
     this.pause();
+
 
     if (frameNumber >= 0 && frameNumber < framesManager.frames.totalFrames()) {
       this.drawFrame(frameNumber);
@@ -89,9 +88,7 @@ let player = {
   },
 
   play: function() {
-    if (!this.isReady) {
-      return;
-    }
+    if (!this.isReady) return;
 
     this.isPlaying = true;
 
@@ -101,9 +98,7 @@ let player = {
   },
 
   pause: function() {
-    if (!this.isReady) {
-      return;
-    }
+    if (!this.isReady) return;
 
     this.isPlaying = false;
     if (this.timeout != null) {
@@ -430,7 +425,7 @@ function addAnnotatedObjectControls(annotatedObject) {
     annotatedObject.add(new AnnotatedFrame(player.currentFrame, bbox, true));
   });
   visibleLabel.append(visible);
-  visibleLabel.append('Is visible?');
+  visibleLabel.append('&nbsp;&nbsp;Is visible?');
 
   let hideLabel = $('<label>');
   let hide = $('<input type="checkbox" />');
@@ -438,7 +433,7 @@ function addAnnotatedObjectControls(annotatedObject) {
     annotatedObject.hideOthers = this.checked;
   });
   hideLabel.append(hide);
-  hideLabel.append('Hide others?');
+  hideLabel.append('&nbsp;&nbsp;Hide others?');
 
   let del = $('<input type="button" value="Delete" />');
   del.click(function() {
@@ -472,8 +467,6 @@ function addAnnotatedObjectControls(annotatedObject) {
 }
 
 function downloadFile(filename, text) {
-  window.URL = window.webkitURL || window.URL;
-
   let bb = new Blob([text], {type: 'text/xml'});
 
   var a = document.querySelector('#downloadXML');
@@ -514,16 +507,16 @@ function generateXml() {
 
       let bbox = annotatedFrame.bbox;
       if (bbox != null) {
-        let isGroundThruth = annotatedFrame.isGroundTruth ? 1 : 0;
+        let isGroundTruth = annotatedFrame.isGroundTruth ? 1 : 0;
 
         xml += '    ';
         xml += '<polygon>';
         xml += '<frame>' + frameNumber + '</frame>';
         xml += '<t>' + framesManager.frames.getFrameTimestamp(frameNumber) + '</t>';
-        xml += '<pt><x>' + bbox.x + '</x><y>' + bbox.y + '</y><l>' + isGroundThruth + '</l></pt>';
-        xml += '<pt><x>' + bbox.x + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundThruth + '</l></pt>';
-        xml += '<pt><x>' + (bbox.x + bbox.width) + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundThruth + '</l></pt>';
-        xml += '<pt><x>' + (bbox.x + bbox.width) + '</x><y>' + bbox.y + '</y><l>' + isGroundThruth + '</l></pt>';
+        xml += '<pt><x>' + bbox.x + '</x><y>' + bbox.y + '</y><l>' + isGroundTruth + '</l></pt>';
+        xml += '<pt><x>' + bbox.x + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundTruth + '</l></pt>';
+        xml += '<pt><x>' + (bbox.x + bbox.width) + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundTruth + '</l></pt>';
+        xml += '<pt><x>' + (bbox.x + bbox.width) + '</x><y>' + bbox.y + '</y><l>' + isGroundTruth + '</l></pt>';
         xml += '</polygon>\n';
       }
     }
@@ -578,11 +571,11 @@ function importXml() {
       let polygons = object.find('polygon');
       for (let j = 0; j < polygons.length; j++) {
         let polygon = $(polygons[j]);
-        let frameNumber = parseInt(polygon.find('t').text());
+        let frameNumber = parseInt(polygon.find('frame').text());
         let pts = polygon.find('pt');
         let topLeft = $(pts[0]);
         let bottomRight = $(pts[2]);
-        let isGroundThrough = parseInt(topLeft.find('l').text()) == 1;
+        let isGroundTruth = parseInt(topLeft.find('l').text()) == 1;
         let x = parseInt(topLeft.find('x').text());
         let y = parseInt(topLeft.find('y').text());
         let w = parseInt(bottomRight.find('x').text()) - x;
@@ -594,7 +587,7 @@ function importXml() {
         }
 
         let bbox = new BoundingBox(x, y, w, h);
-        let annotatedFrame = new AnnotatedFrame(frameNumber, bbox, isGroundThrough);
+        let annotatedFrame = new AnnotatedFrame(frameNumber, bbox, isGroundTruth);
         annotatedObject.add(annotatedFrame);
 
         lastFrame = frameNumber;
