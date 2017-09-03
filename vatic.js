@@ -341,7 +341,7 @@ class AnnotatedObjectsTracker {
     });
   }
 
-  getFrameWithObjects(frameNumber) {
+  getFrameWithObjects(frameNumber, trackLargeSeek = true) {
     return new Promise((resolve, _) => {
 
       // The "starting frame" of this frameNumber is the most recent
@@ -351,8 +351,8 @@ class AnnotatedObjectsTracker {
 
       // If the stride between frameNumber and startFrame is large, then
       // the user probably didn't want to track across this seek anyways
-      const DONT_TRACK_LARGE_SEEK = 10;
-      if ((frameNumber-i) > DONT_TRACK_LARGE_SEEK) {
+      const LARGE_SEEK = 50;
+      if ((frameNumber-i) > LARGE_SEEK || !trackLargeSeek) {
         this.framesManager.frames.getFrame(frameNumber).then((blob) => {
           blobToImage(blob).then((img) => {
             let result = [];

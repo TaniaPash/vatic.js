@@ -85,18 +85,22 @@ let player = {
 
     this.pause();
 
+    // If the user help the control key whilst seeking (or clicking the seek bar)
+    // then they don't want to try and track across large jumps
+    let trackLargeSeek = !window.event.ctrlKey;
+
     if (frameNumber >= 0 && frameNumber < framesManager.frames.totalFrames()) {
       // This will lock the controls so that the user doesn't jump
       // around frames as promises are resolved.
       this.isSeeking = true;
 
-      this.drawFrame(frameNumber).then(() => { this.isSeeking = false; });
+      this.drawFrame(frameNumber, trackLargeSeek).then(() => { this.isSeeking = false; });
       this.currentFrame = frameNumber;
     }
   },
 
   play: function() {
-    if (!this.isReady) return;
+    if (!this.isReady || this.isSeeking) return;
 
     this.isPlaying = true;
 
@@ -141,9 +145,9 @@ let player = {
     });
   },
 
-  drawFrame: function(frameNumber) {
+  drawFrame: function(frameNumber, trackLargeSeek = true) {
     return new Promise((resolve, _) => {
-      annotatedObjectsTracker.getFrameWithObjects(frameNumber).then((frameWithObjects) => {
+      annotatedObjectsTracker.getFrameWithObjects(frameNumber, trackLargeSeek).then((frameWithObjects) => {
         ctx.drawImage(frameWithObjects.img, 0, 0);
 
         // Update frame number
