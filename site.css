@@ -17,18 +17,26 @@
 
 .bbox {
   /* border width MUST be given in pixels */
-  border: 1px solid #FF0000;
+  border: 2px solid #FF0000;
   position: absolute;
   z-index: 3;
+  opacity: 0.3;
+}
+
+.bbox:hover,
+.handle:hover,
+.ui-resizable-handle:hover {
+  opacity: 0.8;
 }
 
 .handle, .ui-resizable-handle {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   border: 1px solid rgba(255, 0, 0, .5);
   background-color: rgba(255, 255, 0, .05);
   position: absolute;
+  opacity: 0.5;
 }
 
 .center-drag {
