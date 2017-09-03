@@ -343,8 +343,45 @@ class AnnotatedObjectsTracker {
 
   getFrameWithObjects(frameNumber) {
     return new Promise((resolve, _) => {
+
+      // The "starting frame" of this frameNumber is the most recent
+      // frame that was annotated. That way, if the user is at frame 6
+      // and seeks 10 frames to 16, the start frame of frame 16 is 6.
       let i = this.startFrame(frameNumber);
 
+      // If the stride between frameNumber and startFrame is large, then
+      // the user probably didn't want to track across this seek anyways
+      const DONT_TRACK_LARGE_SEEK = 10;
+      if ((frameNumber-i) > DONT_TRACK_LARGE_SEEK) {
+        this.framesManager.frames.getFrame(frameNumber).then((blob) => {
+          blobToImage(blob).then((img) => {
+            let result = [];
+
+            // check to see if each object has an annotation...
+            for (let j = 0; j < this.annotatedObjects.length; j++) {
+              let annotatedObject = this.annotatedObjects[j];
+              let annotatedFrame = annotatedObject.get(frameNumber);
+
+              // ...if it doesn't, then just push a null bbox, which annotates it as
+              // not visible.
+              if (annotatedFrame == null) {
+                let annotatedFrame = new AnnotatedFrame(frameNumber, null, false);
+                annotatedObject.add(annotatedFrame);
+                result.push({annotatedObject: annotatedObject, annotatedFrame: annotatedFrame});
+              } else {
+                result.push({annotatedObject: annotatedObject, annotatedFrame: annotatedFrame});
+              }
+            }
+            
+            resolve({img: img, objects: result});
+          });
+        });
+        return;
+      }
+
+      // Using the startFrame of a given frameNumber, track sequentially from
+      // startFrame to frameNumber -- that way frames 6 to 16 will
+      // have optical flow tracks.
       let trackNextFrame = () => {
         this.track(i).then((frameWithObjects) => {
           if (i == frameNumber) {
