@@ -39,6 +39,28 @@ function getEntryByFilename(entries, filename) {
   return false;
 }
 
+function getFirstAndLast(entries) {
+  let first = Number.MAX_SAFE_INTEGER;
+  let last = Number.MAX_SAFE_INTEGER;
+
+  // Loop through each entry
+  for (let i=0; i<entries.length; i++) {
+    let file = entries[i].filename;
+
+    // Take off the `.jpg` extension
+    name = file.substr(0, file.length-4);
+
+    // Convert to a number
+    let fnum = parseInt(name);
+    if (isFinite(fnum)) {
+      if (fnum < first) first = fnum;
+      if (fnum > last) last = fnum;
+    }
+  }
+
+  return [ first, last ];
+}
+
 /**
  * Extracts the frame sequence from a previously generated zip file.
  */
@@ -54,6 +76,8 @@ function extractFramesFromZip(config, file) {
 
           let timestampXML = null;
           let timestampMap = {};
+
+          let [first, last] = getFirstAndLast(entries);
 
           // Try and find the timestamp file
           let entry = getEntryByFilename(entries, config.timestampFile);
@@ -90,14 +114,24 @@ function extractFramesFromZip(config, file) {
             getFrame: (frameNumber) => {
               return new Promise((resolve, _) => {
 
+                // Shift frame number by starting frame number
+                frameNumber = frameNumber + first;
+
                 // Pad an integer with zeros
                 let filename = pad(frameNumber, config.padValue) + config.imageExtension;
                 let entry = getEntryByFilename(entries, filename);
 
-                entry.getData(new zip.BlobWriter(), function(content) {
-                  let blob = new Blob([ content ], { type: config.imageMimeType });
-                  resolve(blob);
-                })
+                if (!entry) {
+                  console.error('Could not find frame ' + frameNumber + ' ('+first+', '+last+')');
+                  // resolve({});
+                } else {
+
+                  entry.getData(new zip.BlobWriter(), function(content) {
+                    let blob = new Blob([ content ], { type: config.imageMimeType });
+                    resolve(blob);
+                  })
+
+                }
 
               });
             },
