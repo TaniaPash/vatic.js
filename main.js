@@ -164,8 +164,8 @@ let player = {
             let border = parseInt($(annotatedObject.dom).css('border-width'));
 
             annotatedObject.dom.style.display = 'block';
-            annotatedObject.dom.style.width = annotatedFrame.bbox.width + border*2 + 'px';
-            annotatedObject.dom.style.height = annotatedFrame.bbox.height + border*2 + 'px';
+            annotatedObject.dom.style.width = annotatedFrame.bbox.width + 'px';
+            annotatedObject.dom.style.height = annotatedFrame.bbox.height + 'px';
             annotatedObject.dom.style.left = annotatedFrame.bbox.x + 'px';
             annotatedObject.dom.style.top = annotatedFrame.bbox.y + 'px';
             annotatedObject.visible.prop('checked', true);
