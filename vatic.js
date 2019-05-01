@@ -155,6 +155,8 @@ class OpticalFlow {
       throw 'not initialized';
     }
     
+    return bboxes;
+    
     jsfeat.imgproc.grayscale(imageData.data, imageData.width, imageData.height, this.currentPyramid.data[0]);
     this.currentPyramid.build(this.currentPyramid.data[0]);
 
