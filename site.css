@@ -21,6 +21,7 @@
   position: absolute;
   z-index: 3;
   opacity: 0.3;
+  box-sizing: unset;
 }
 
 .bbox:hover,
