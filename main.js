@@ -505,13 +505,13 @@ function generateXml() {
 
     xml += '  <object>\n';
     xml += '    <name>' + annotatedObject.name + '</name>\n';
-    // xml += '    <moving>true</moving>\n';
-    // xml += '    <action/>\n';
-    // xml += '    <verified>0</verified>\n';
+    xml += '    <moving>true</moving>\n';
+    xml += '    <action/>\n';
+    xml += '    <verified>0</verified>\n';
     xml += '    <id>' + annotatedObject.id + '</id>\n';
-    // xml += '    <createdFrame>0</createdFrame>\n';
-    // xml += '    <startFrame>0</startFrame>\n';
-    // xml += '    <endFrame>' + (totalFrames - 1 ) + '</endFrame>\n';
+    xml += '    <createdFrame>0</createdFrame>\n';
+    xml += '    <startFrame>0</startFrame>\n';
+    xml += '    <endFrame>' + (totalFrames - 1 ) + '</endFrame>\n';
 
     for (let frameNumber = 0; frameNumber < totalFrames; frameNumber++) {
       let annotatedFrame = annotatedObject.get(frameNumber);
@@ -521,15 +521,14 @@ function generateXml() {
       if (bbox != null) {
         let isGroundTruth = annotatedFrame.isGroundTruth ? 1 : 0;
 
-        xml += '    ';
-        xml += '<polygon>';
-        xml += '<frame>' + frameNumber + '</frame>';
-        xml += '<t>' + framesManager.frames.getFrameTimestamp(frameNumber) + '</t>';
-        xml += '<pt><x>' + bbox.x + '</x><y>' + bbox.y + '</y><l>' + isGroundTruth + '</l></pt>';
-        xml += '<pt><x>' + bbox.x + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundTruth + '</l></pt>';
-        xml += '<pt><x>' + (bbox.x + bbox.width) + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundTruth + '</l></pt>';
-        xml += '<pt><x>' + (bbox.x + bbox.width) + '</x><y>' + bbox.y + '</y><l>' + isGroundTruth + '</l></pt>';
-        xml += '</polygon>\n';
+       xml += '    ';
+       xml += '<polygon>';
+       xml += '<t>' + frameNumber + '</t>';
+       xml += '<pt><x>' + bbox.x + '</x><y>' + bbox.y + '</y><l>' + isGroundTruth + '</l></pt>';
+       xml += '<pt><x>' + bbox.x + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundTruth + '</l></pt>';
+       xml += '<pt><x>' + (bbox.x + bbox.width) + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundTruth + '</l></pt>';
+       xml += '<pt><x>' + (bbox.x + bbox.width) + '</x><y>' + bbox.y + '</y><l>' + isGroundTruth + '</l></pt>';
+       xml += '</polygon>\n';
       }
     }
 
