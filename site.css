@@ -17,7 +17,7 @@
 
 .bbox {
   /* border width MUST be given in pixels */
-  border: 2px solid #FF0000;
+  border: 1px solid #FF0000;
   position: absolute;
   z-index: 3;
   opacity: 0.3;
