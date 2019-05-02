@@ -582,7 +582,7 @@ function importXml() {
       let polygons = object.find('polygon');
       for (let j = 0; j < polygons.length; j++) {
         let polygon = $(polygons[j]);
-        let frameNumber = parseInt(polygon.find('frame').text());
+        let frameNumber = parseInt(polygon.find('t').text());
         let pts = polygon.find('pt');
         let topLeft = $(pts[0]);
         let bottomRight = $(pts[2]);
