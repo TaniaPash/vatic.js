@@ -523,6 +523,7 @@ function generateXml() {
 
        xml += '    ';
        xml += '<polygon>';
+       xml += '<frame>' + frameNumber + '</frame>';
        xml += '<t>' + frameNumber + '</t>';
        xml += '<pt><x>' + bbox.x + '</x><y>' + bbox.y + '</y><l>' + isGroundTruth + '</l></pt>';
        xml += '<pt><x>' + bbox.x + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundTruth + '</l></pt>';
@@ -582,7 +583,8 @@ function importXml() {
       let polygons = object.find('polygon');
       for (let j = 0; j < polygons.length; j++) {
         let polygon = $(polygons[j]);
-        let frameNumber = parseInt(polygon.find('t').text());
+        let frameNumberFrame = parseInt(polygon.find('frame').text());
+        let frameNumberT = parseInt(polygon.find('t').text());
         let pts = polygon.find('pt');
         let topLeft = $(pts[0]);
         let bottomRight = $(pts[2]);
@@ -591,7 +593,7 @@ function importXml() {
         let y = parseInt(topLeft.find('y').text());
         let w = parseInt(bottomRight.find('x').text()) - x;
         let h = parseInt(bottomRight.find('y').text()) - y;
-
+        let frameNumber = ((!isNaN(frameNumberFrame)) ? frameNumberFrame : frameNumberT);
         if (lastFrame + 1 != frameNumber) {
           let annotatedFrame = new AnnotatedFrame(lastFrame + 1, null, true);
           annotatedObject.add(annotatedFrame);
