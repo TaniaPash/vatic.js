@@ -37,8 +37,36 @@ let generateXmlButton = document.querySelector('#generateXml');
 let framesManager = new FramesManager();
 let annotatedObjectsTracker = new AnnotatedObjectsTracker(framesManager);
 
+getNextKey = function ({ lastKey, classname }) {
+  if (!lastKey) {
+    return `A_${classname}`
+  }
+  let nextKey;
+
+  if (lastKey === 'Z') {
+
+    nextKey = String.fromCharCode(lastKey.charCodeAt() - 25) + String.fromCharCode(lastKey.charCodeAt() - 25); // AA or aa
+
+  } else {
+    var lastChar = lastKey.slice(-1);
+    var sub = lastKey.slice(0, -1);
+    if (lastChar === 'Z') {
+      nextKey = getNextKey(sub) + String.fromCharCode(lastChar.charCodeAt() - 25);
+    } else {
+      nextKey = sub + String.fromCharCode(lastChar.charCodeAt() + 1);
+    }
+  }
+  return `${nextKey}_${classname}`
+};
+
+
+
+
+
+
+
 let slider = {
-  init: function(min, max, onChange) {
+  init: function (min, max, onChange) {
     $(sliderElement).slider('option', 'min', min);
     $(sliderElement).slider('option', 'max', max);
     $(sliderElement).on('slidestop', (e, ui) => {
@@ -48,11 +76,11 @@ let slider = {
 
     frameCount.text('0 / ' + max);
   },
-  setPosition: function(frameNumber) {
+  setPosition: function (frameNumber) {
     $(sliderElement).slider('option', 'value', frameNumber);
   },
-  reset: function() {
-    $(sliderElement).slider({disabled: true});
+  reset: function () {
+    $(sliderElement).slider({ disabled: true });
   }
 };
 slider.reset();
@@ -64,7 +92,7 @@ let player = {
   isSeeking: false,
   timeout: null,
 
-  initialize: function() {
+  initialize: function () {
     this.currentFrame = 0;
     this.isPlaying = false;
     this.isReady = false;
@@ -73,11 +101,11 @@ let player = {
     playBtn.text('Play');
   },
 
-  ready: function() {
+  ready: function () {
     this.isReady = true;
   },
 
-  seek: function(frameNumber) {
+  seek: function (frameNumber) {
     if (!this.isReady) return;
 
     // Don't allow the user to seek before the last seek is completed
@@ -99,7 +127,7 @@ let player = {
     }
   },
 
-  play: function() {
+  play: function () {
     if (!this.isReady || this.isSeeking) return;
 
     this.isPlaying = true;
@@ -109,7 +137,7 @@ let player = {
     this.nextFrame();
   },
 
-  pause: function() {
+  pause: function () {
     if (!this.isReady) return;
 
     this.isPlaying = false;
@@ -121,7 +149,7 @@ let player = {
     playBtn.text('Play');
   },
 
-  toogle: function() {
+  toogle: function () {
     if (!this.isPlaying) {
       this.play();
     } else {
@@ -129,7 +157,7 @@ let player = {
     }
   },
 
-  nextFrame: function() {
+  nextFrame: function () {
     if (!this.isPlaying) {
       return;
     }
@@ -145,7 +173,7 @@ let player = {
     });
   },
 
-  drawFrame: function(frameNumber, trackLargeSeek = true) {
+  drawFrame: function (frameNumber, trackLargeSeek = true) {
     return new Promise((resolve, _) => {
       annotatedObjectsTracker.getFrameWithObjects(frameNumber, trackLargeSeek).then((frameWithObjects) => {
         ctx.drawImage(frameWithObjects.img, 0, 0);
@@ -159,7 +187,6 @@ let player = {
           let annotatedObject = object.annotatedObject;
           let annotatedFrame = object.annotatedFrame;
           if (annotatedFrame.isVisible()) {
-
             // we assume the border is given in pixels
             let border = parseInt($(annotatedObject.dom).css('border-width'));
 
@@ -169,6 +196,7 @@ let player = {
             annotatedObject.dom.style.left = annotatedFrame.bbox.x + 'px';
             annotatedObject.dom.style.top = annotatedFrame.bbox.y + 'px';
             annotatedObject.visible.prop('checked', true);
+
           } else {
             annotatedObject.dom.style.display = 'none';
             annotatedObject.visible.prop('checked', false);
@@ -193,7 +221,7 @@ let player = {
     });
   },
 
-  done: function() {
+  done: function () {
     this.currentFrame = 0;
     this.isPlaying = false;
 
@@ -250,7 +278,7 @@ function extractionFileUploaded() {
   player.initialize();
 
   // Save name of zipped folder for XML annotation generation
-  config['framesZipFilename'] = this.files[0].name.substr(0, this.files[0].name.length-4);
+  config['framesZipFilename'] = this.files[0].name.substr(0, this.files[0].name.length - 4);
 
   // Extract the specified zipped archive using zip.js
   let promise = extractFramesFromZip(config, this.files[0]);
@@ -309,7 +337,7 @@ function interactify(dom, onChange) {
     stop: (e, ui) => {
       let position = bbox.position();
       onChange(Math.round(position.left), Math.round(position.top), Math.round(bbox.width()), Math.round(bbox.height()));
-    }
+    },
   });
 
   bbox.draggable({
@@ -359,7 +387,7 @@ doodle.onmousemove = function (e) {
 /**
  * Creation of a new bounding box
  */
-doodle.onclick = function (e) {
+doodle.onclick = function () {
   if (doodle.style.cursor != 'crosshair') {
     return;
   }
@@ -372,7 +400,6 @@ doodle.onclick = function (e) {
     annotatedObject.add(new AnnotatedFrame(player.currentFrame, bbox, true));
     annotatedObjectsTracker.annotatedObjects.push(annotatedObject);
     tmpAnnotatedObject = null;
-
     interactify(
       annotatedObject.dom,
       (x, y, width, height) => {
@@ -397,33 +424,45 @@ doodle.onclick = function (e) {
 }
 
 function newBboxElement() {
-    let dom = document.createElement('div');
-    dom.className = 'bbox';
-    doodle.appendChild(dom);
-    return dom;
+  let dom = document.createElement('div');
+  dom.className = 'bbox';
+  doodle.appendChild(dom);
+  return dom;
 }
 
 function addAnnotatedObjectControls(annotatedObject) {
   let name = $('<input type="text" value="Name?" />');
+
+  let lastKey;
+  if (annotatedObjectsTracker.annotatedObjects[0].name) {
+    const keys = annotatedObjectsTracker.annotatedObjects.map(obj => obj.name).filter(el => el).sort(function (a, b) {
+      return a.length - b.length || // sort by length, if equal then
+        a.localeCompare(b);    // sort by dictionary order
+    });
+    lastKey = keys.pop().match(/(\w*)_\w*/)[1]
+  }
+  name.prop('value', getNextKey({ lastKey, classname: 'ball' }))
+  annotatedObject.name = name.prop('value');
   if (annotatedObject.name) {
     name.val(annotatedObject.name);
   }
-  name.on('change keyup paste mouseup', function() {
+  name.on('change keyup paste mouseup', function () {
     annotatedObject.name = this.value;
   });
 
   let id = $('<input type="text" value="ID?" />');
+  id.prop('value', name.prop('value'))
   if (annotatedObject.id) {
     id.val(annotatedObject.id);
   }
-  id.on('change keyup paste mouseup', function() {
+  id.on('change keyup paste mouseup', function () {
     annotatedObject.id = this.value;
   });
 
   let visibleLabel = $('<label>');
-  let visible = $('<input type="checkbox" checked="checked" />');
+  let visible = $('<input type="checkbox" id = "checkbox" checked="checked" />');
   annotatedObject.visible = visible;
-  visible.change(function() {
+  visible.change(function () {
     let bbox;
     if (this.checked) {
       annotatedObject.dom.style.display = 'block';
@@ -441,14 +480,14 @@ function addAnnotatedObjectControls(annotatedObject) {
 
   let hideLabel = $('<label>');
   let hide = $('<input type="checkbox" />');
-  hide.change(function() {
+  hide.change(function () {
     annotatedObject.hideOthers = this.checked;
   });
   hideLabel.append(hide);
   hideLabel.append('&nbsp;&nbsp;Hide others?');
 
   let del = $('<input type="button" value="Delete" />');
-  del.click(function() {
+  del.click(function () {
     for (let i = 0; annotatedObjectsTracker.annotatedObjects.length; i++) {
       if (annotatedObject === annotatedObjectsTracker.annotatedObjects[i]) {
         clearAnnotatedObject(i);
@@ -462,7 +501,8 @@ function addAnnotatedObjectControls(annotatedObject) {
     'border': '1px solid black',
     'display': 'inline-block',
     'margin': '5px',
-    'padding': '10px'});
+    'padding': '10px'
+  });
   div.append(name);
   div.append($('<br />'));
   div.append(id);
@@ -479,7 +519,7 @@ function addAnnotatedObjectControls(annotatedObject) {
 }
 
 function downloadFile(filename, text) {
-  let bb = new Blob([text], {type: 'text/xml'});
+  let bb = new Blob([text], { type: 'text/xml' });
 
   var a = document.querySelector('#downloadXML');
   a.download = filename;
@@ -511,7 +551,7 @@ function generateXml() {
     xml += '    <id>' + annotatedObject.id + '</id>\n';
     xml += '    <createdFrame>0</createdFrame>\n';
     xml += '    <startFrame>0</startFrame>\n';
-    xml += '    <endFrame>' + (totalFrames - 1 ) + '</endFrame>\n';
+    xml += '    <endFrame>' + (totalFrames - 1) + '</endFrame>\n';
 
     for (let frameNumber = 0; frameNumber < totalFrames; frameNumber++) {
       let annotatedFrame = annotatedObject.get(frameNumber);
@@ -521,15 +561,15 @@ function generateXml() {
       if (bbox != null) {
         let isGroundTruth = annotatedFrame.isGroundTruth ? 1 : 0;
 
-       xml += '    ';
-       xml += '<polygon>';
-       xml += '<frame>' + frameNumber + '</frame>';
-       xml += '<t>' + frameNumber + '</t>';
-       xml += '<pt><x>' + bbox.x + '</x><y>' + bbox.y + '</y><l>' + isGroundTruth + '</l></pt>';
-       xml += '<pt><x>' + bbox.x + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundTruth + '</l></pt>';
-       xml += '<pt><x>' + (bbox.x + bbox.width) + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundTruth + '</l></pt>';
-       xml += '<pt><x>' + (bbox.x + bbox.width) + '</x><y>' + bbox.y + '</y><l>' + isGroundTruth + '</l></pt>';
-       xml += '</polygon>\n';
+        xml += '    ';
+        xml += '<polygon>';
+        xml += '<frame>' + frameNumber + '</frame>';
+        xml += '<t>' + frameNumber + '</t>';
+        xml += '<pt><x>' + bbox.x + '</x><y>' + bbox.y + '</y><l>' + isGroundTruth + '</l></pt>';
+        xml += '<pt><x>' + bbox.x + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundTruth + '</l></pt>';
+        xml += '<pt><x>' + (bbox.x + bbox.width) + '</x><y>' + (bbox.y + bbox.height) + '</y><l>' + isGroundTruth + '</l></pt>';
+        xml += '<pt><x>' + (bbox.x + bbox.width) + '</x><y>' + bbox.y + '</y><l>' + isGroundTruth + '</l></pt>';
+        xml += '</polygon>\n';
       }
     }
 
@@ -617,8 +657,11 @@ function importXml() {
   reader.readAsText(this.files[0]);
 }
 
+
+
+
 // Keyboard shortcuts
-window.onkeydown = function(e) {
+window.onkeydown = function (e) {
   let preventDefault = true;
 
   if (e.keyCode === 32) { // space
@@ -644,6 +687,78 @@ window.onkeydown = function(e) {
 };
 
 // Bind to Alt+n
-shortcut('optn n', document.body).bindsTo(function() {
+shortcut('optn n', document.body).bindsTo(function (e) {
   doodle.style.cursor = 'crosshair';
 });
+
+
+// move top
+shortcut('optn shift w', document.body).bindsTo(function (e) {
+  e.preventDefault()
+  updatePosition("top", (-1))
+  updatePosition("height", (1))
+})
+
+shortcut('shift w', document.body).bindsTo(function (e) {
+  e.preventDefault()
+  updatePosition("top", (1))
+  updatePosition("height", (-1))
+})
+
+// move bottom
+shortcut('optn shift s', document.body).bindsTo(function (e) {
+  e.preventDefault()
+  updatePosition("height", (1))
+})
+
+shortcut('shift s', document.body).bindsTo(function (e) {
+  e.preventDefault()
+  updatePosition("height", (-1))
+})
+
+// move left side
+shortcut('optn shift a', document.body).bindsTo(function (e) {
+  e.preventDefault()
+  updatePosition("left", (-1))
+  updatePosition("width", (1))
+})
+
+shortcut('shift a', document.body).bindsTo(function (e) {
+  e.preventDefault()
+  updatePosition("left", (1))
+  updatePosition("width", (-1))
+})
+
+// move right side
+shortcut('optn shift d', document.body).bindsTo(function (e) {
+  e.preventDefault()
+  updatePosition("width", (1))
+})
+
+shortcut('shift d', document.body).bindsTo(function (e) {
+  e.preventDefault()
+  updatePosition("width", (-1))
+})
+
+const updatePosition = function (param, value) {
+  if (annotatedObjectsTracker.annotatedObjects.length > 1) {
+    alert(`Shortcuts disable because ${annotatedObjectsTracker.annotatedObjects.length} boxes are visible`)
+  }
+  const bbox = $('.bbox');
+  const position = bbox.position();
+  let initValue;
+  if (param === 'width') {
+    initValue = bbox.width()
+  } else if (param === 'height') {
+    initValue = bbox.height()
+  } else if (param === 'top') {
+    initValue = position.top
+  } else if (param === 'left') {
+    initValue = position.left
+  }
+  bbox.css(`${param}`, (initValue + value));
+  let bbox2 = new BoundingBox(Math.round(position.left), Math.round(position.top), Math.round(bbox.width()), Math.round(bbox.height()));
+  const frameNo = player.currentFrame;
+  annotatedObjectsTracker.annotatedObjects[0].frames[frameNo].bbox = bbox2;
+  return annotatedObjectsTracker;
+}
