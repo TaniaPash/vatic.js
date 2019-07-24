@@ -460,7 +460,7 @@ function addAnnotatedObjectControls(annotatedObject) {
   });
 
   let visibleLabel = $('<label>');
-  let visible = $('<input type="checkbox" id = "checkbox" checked="checked" />');
+  let visible = $('<input type="checkbox" id="visible" checked="checked" />');
   annotatedObject.visible = visible;
   visible.change(function () {
     let bbox;
@@ -691,6 +691,16 @@ shortcut('optn n', document.body).bindsTo(function (e) {
   doodle.style.cursor = 'crosshair';
 });
 
+// toggle is visible? checkbox
+shortcut('shift q', document.body).bindsTo(function (e) {
+  e.preventDefault()
+  if (annotatedObjectsTracker.annotatedObjects.length > 1) {
+    alert(`Shortcuts disable because ${annotatedObjectsTracker.annotatedObjects.length} boxes are visible`)
+  }
+  const visible = $("visible");
+  const checked = visible.prop('checked');
+  visible.prop('checked', !checked).change();
+})
 
 // move top
 shortcut('optn shift w', document.body).bindsTo(function (e) {
